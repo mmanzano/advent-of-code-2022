@@ -1,4 +1,5 @@
 <?php
+
 $gameInstructions = <<<GAME
 A Y
 B X
@@ -130,108 +131,27 @@ class Result
     }
 }
 
-abstract class Player
-{
-    public function __construct(public string $movement)
-    {
-    }
-
-    abstract protected static function rock(): string;
-    abstract protected static function paper(): string;
-    abstract protected static function scissors(): string;
-
-    public function movementInNaturalLanguage()
-    {
-        return match($this->movement) {
-            self::rock() => 'rock',
-            self::paper() => 'paper',
-            self::scissors() => 'scissors',
-        };
-    }
-}
-
-class PlayerOne extends Player
+class PlayerOne
 {
     const ROCK = 'A';
     const PAPER = 'B';
     const SCISSORS = 'C';
 
-    protected static function rock(): string
+    public function __construct(public string $movement)
     {
-        return self::ROCK;
-    }
-
-    protected static function paper(): string
-    {
-        return self::PAPER;
-    }
-
-    protected static function scissors(): string
-    {
-        return self::SCISSORS;
     }
 }
 
-class Me extends Player
+class Me
 {
     const ROCK = 'X';
     const PAPER = 'Y';
     const SCISSORS = 'Z';
 
-    protected static function rock(): string
+    public function __construct(public string $movement)
     {
-        return self::ROCK;
-    }
-
-    protected static function paper(): string
-    {
-        return self::PAPER;
-    }
-
-    protected static function scissors(): string
-    {
-        return self::SCISSORS;
     }
 }
 
 $gameInstructions = file_get_contents('day-02-input-01.txt');
 echo Processor::fromPayload($gameInstructions)->game->totalScore();
-
-
-// Dead Code
-class RoundPhaseOne
-{
-    public function __construct(private PlayerOne $playerOne, private Me $me)
-    {
-    }
-
-    public function scoreCalculation(): int
-    {
-        $movementScore = match($this->me->movement) {
-            Me::ROCK => Scores::ROCK,
-            Me::PAPER => Scores::PAPER,
-            Me::SCISSORS => Scores::SCISSORS,
-        };
-
-        return $movementScore + $this->calculateResultPoints();
-    }
-
-    private function calculateResultPoints()
-    {
-        $winMovements = [
-            Me::ROCK => PlayerOne::SCISSORS,
-            Me::SCISSORS => PlayerOne::PAPER,
-            Me::PAPER => PlayerOne::ROCK,
-        ];
-
-        if ($this->playerOne->movementInNaturalLanguage() === $this->me->movementInNaturalLanguage()) {
-            return Scores::DRAW;
-        }
-
-        if ($winMovements[$this->me->movement] === $this->playerOne->movement) {
-            return Scores::WON;
-        }
-
-        return Scores::LOST;
-    }
-}
