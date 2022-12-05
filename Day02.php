@@ -75,17 +75,11 @@ class Round
 
     public function scoreCalculation(): int
     {
-        $movementScore = match($this->me->movement) {
-            Me::ROCK => Scores::ROCK,
-            Me::PAPER => Scores::PAPER,
-            Me::SCISSORS => Scores::SCISSORS,
-        };
-
-        return $movementScore + $this->result->toScore();
+        return Score::fromMe($this->me) + Score::fromResult($this->result);
     }
 }
 
-class Scores
+class Score
 {
     const ROCK = 1;
     const PAPER = 2;
@@ -94,6 +88,23 @@ class Scores
     const LOST = 0;
     const DRAW = 3;
     const WON = 6;
+
+    public static function fromMe(Me $me)
+    {
+        return match($me->movement) {
+            Me::ROCK => self::ROCK,
+            Me::PAPER => self::PAPER,
+            Me::SCISSORS => self::SCISSORS,
+        };
+    }
+    public static function fromResult(Result $result)
+    {
+        return match($result->result) {
+            Result::LOSE => self::LOST,
+            Result::DRAW => self::DRAW,
+            Result::WIN => self::WON,
+        };
+    }
 }
 
 class Result
@@ -102,17 +113,8 @@ class Result
     const DRAW = 'Y';
     const WIN = 'Z';
 
-    public function __construct(private string $result)
+    public function __construct(public string $result)
     {
-    }
-
-    public function toScore()
-    {
-        return match($this->result) {
-            self::LOSE => Scores::LOST,
-            self::DRAW => Scores::DRAW,
-            self::WIN => Scores::WON,
-        };
     }
 
     public function isDraw()
